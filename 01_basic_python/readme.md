@@ -1,4 +1,4 @@
-# Python基础
+# Python 基础
  
 Python是一种解释型计算机编程语言。
 

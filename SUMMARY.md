@@ -5,9 +5,9 @@
     * [字符串和编码](./01_basic_python/string_code.md)
     * [集合类型](./01_basic_python/collection_type.md)
      
-* [函数]
+* [函数](./02_function/readme.md)
     * 
-* [函数式编程]
+* [函数式编程](./03_functional_programming/readme.md)
 
 * [面向对象]()
 
@@ -17,4 +17,10 @@
 
 * [I/O编程]()
 
-*  
+* [Mysql数据库](./database/mysql/readme.md)  
+
+  * [Mysql索引原理](./database/mysql/mysql_index.md)  
+  
+  * [Mysql索引的使用](./database/mysql/use_mysql_index.md) 
+  
+  * [Mysql事务](./database/mysql/mysql_transaction.md)  
