@@ -46,7 +46,15 @@ def f1(a, b, c=0, *args, **kw):
     print('a =', a, 'b =', b, 'c =', c, 'args =', args, 'kw =', kw)
 
 if __name__ == '__main__':
-    f1(1, 2, 3 , x=4, y=5,c=99)
+    a = [2]
+    b = [99, 100]
+    print(id(a))
+    print(id(b))
+    # a[:] = b # [99,100]
+    a = [99,100]
+    print(id(a))
+    print(id(b))
+    # f1(1, 2, 3 , x=4, y=5,c=99)
     # func_a(a=1,b=2, c=3)
     # func_a(0, 1, 2, 3)
     # func_a(0, k=4, j=5,b=2)
