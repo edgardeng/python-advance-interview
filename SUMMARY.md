@@ -25,3 +25,6 @@
   * [Mysql索引的使用](./database/mysql/use_mysql_index.md) 
   
   * [Mysql事务](./database/mysql/mysql_transaction.md)  
+
+* [Redis数据库](./database/redis/readme.md)  
+
