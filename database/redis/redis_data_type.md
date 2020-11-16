@@ -32,6 +32,7 @@ Redis 键命令的基本语法如下： `COMMAND KEY_NAME`
 * 移除key的过期时间，持久保持。 `PERSIST key_name`
 * key的剩余的过期时间(毫秒)   `PTTL key_name`
 * key的剩余的过期时间(秒)   `TTL key_name`
+* 储存的值的类型 `TYPE key`
 
 * 获取所有的key `KEYS *`
 * 查找所有符合给定模式的key  `KEYS key_*`
@@ -225,6 +226,125 @@ pipe.execute()
 * 自动补全
 * 布隆过滤器
 
+#### BitMap
+##### 1、BitMap 是什么?
+
+  通过一个bit位来表示某个元素对应的值或者状态,其中的key就是对应元素本身。
+  我们知道8个bit可以组成一个Byte，所以bitmap本身会极大的节省储存空间。
+
+##### 2、Redis中的BitMap
+
+  Redis从2.2.0版本开始新增了setbit,getbit,bitcount等几个bitmap相关命令。
+  虽然是新命令，但是并没有新增新的数据类型，因为setbit等命令只不过是在set上的扩展。
+
+##### 3、 命令介绍
+   * `SETBIT key offset value`  设置或者清空key的value(字符串)在offset处的bit值(只能只0或者1)。
+ 
+##### 4、空间占用、以及第一次分配空间需要的时间
+
+offset为2^32-1（分配512MB）需要～300ms，
+offset为2^30-1(分配128MB)需要～80ms，
+offset为2^28-1（分配32MB）需要～30ms，
+offset为2^26-1（分配8MB）需要8ms。<来自官方文档>
+
+大概的空间占用计算公式是：($offset/8/1024/1024)MB
+
+##### 5、使用场景
+
+ 1. 用户签到
+
+根据日期 offset =hash % 365  ； key = 年份#用户id
+```shell script
+setbit 2018#user1 1 1
+setbit 2018#user1 2 1
+bitcount 2018#user1
+```
+> 签到功能(这里不考虑数据落地事宜)，并且需要展示最近一个月的签到情况
+ 
+ 2. 统计活跃用户
+使用时间作为cacheKey，然后用户ID为offset，如果当日活跃过就设置为1
+
+如果计算某几天/月/年的活跃用户呢(暂且约定，统计时间内只有有一天在线就称为活跃)，有请下一个redis的命令
+命令 BITOP operation destkey key [key ...]
+说明：对一个或多个保存二进制位的字符串 key 进行位元操作，并将结果保存到 destkey 上。
+说明：BITOP 命令支持 AND 、 OR 、 NOT 、 XOR 这四种操作中的任意一种参数
+
+```shell script
+setbit 20200101 1 1
+setbit 20200101 2 1
+setbit 20200102 1 1
+bitop and result1 20200101 20200102
+bitcount result1 # 1
+
+bitop or result2 20200101 20200102
+bitcount result2 # 2
+```
+
+ 3. 用户在线状态
+ 
+    使用bitmap是一个节约空间效率又高的一种方法，只需要一个key，然后用户ID为offset，如果在线就设置为1，
+    不在线就设置为0，和上面的场景一样，5000W用户只需要6MB的空间。
+#### HyperLogLog
+Redis HyperLogLog 是用来做基数统计的算法
+
+1. HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。
+
+2. 在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基 数。
+  这和计算基数时，元素越多耗费内存就越多的集合形成鲜明对比。
+
+但是，因为 HyperLogLog 只会根据输入元素来计算基数，而不会储存输入元素本身，所以 HyperLogLog 不能像集合那样，返回输入的各个元素。
+
+##### 什么是基数?
+比如数据集 {1, 3, 5, 7, 5, 7, 8}， 那么这个数据集的基数集为 {1, 3, 5 ,7, 8}, 基数(不重复元素)为5。 
+基数估计就是在误差可接受的范围内，快速计算基数。
+
+##### 命令介绍
+
+* `pfadd key element [element...]` 将所有元素参数添加到 HyperLogLog 数据结构中,如果至少有个元素被添加返回 1， 否则返回 0
+
+* `pfcount key [key...] ` 返回给定 HyperLogLog 的基数估算值。返回给定 HyperLogLog 的基数值，如果多个 HyperLogLog 则返回基数估值之和
+
+* `pfmerge destkey sourcekey [sourcekey...] ` 将多个 HyperLogLog 合并为一个 HyperLogLog ，合并后的 HyperLogLog 的基数估算值是通过对所有 给定 HyperLogLog 进行并集计算得出的。
+
+##### 案例
+
+淘宝网店10个宝贝链接的独立访客（Unique Visitor，简称UV）数
+
+ 1. 对独立访客做标识
+
+ 2. 在访客点击链接时记录下链接编号及访客标记
+
+ 3. 对每一个要统计的链接维护一个数据结构和一个当前UV值，当某个链接发生一次点击时，能迅速定位此用户在今天是否已经点过此链接，如果没有则此链接的UV增加1
+
+#### GEO
+
+Redis GEO 主要用于存储地理位置信息，并对存储的信息进行操作，该功能在 Redis 3.2 版本新增。
+
+Redis GEO 操作方法有：
+
+ * `GEOADD key longitude latitude member [longitude latitude member ...]` ：添加地理位置的坐标。
+ * `GEOPOS key member [member ...]` ：获取地理位置的坐标。
+ * `GEODIST key member1 member2 [m|km|ft|mi]`：计算两个位置之间的距离 (m ：米，默认单位 km ：千米 mi ：英里 ft ：英尺 )
+ * `GEORADIUS key longitude latitude radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [ASC|DESC] [STORE key] [STOREDIST key]`：根据用户给定的经纬度坐标来获取指定范围内的地理位置集合
+   * WITHDIST: 在返回位置元素的同时， 将位置元素与中心之间的距离也一并返回。
+   * WITHCOORD: 将位置元素的经度和维度也一并返回。
+   * WITHHASH: 以 52 位有符号整数的形式， 返回位置元素经过原始 geohash 编码的有序集合分值。 这个选项主要用于底层应用或者调试， 实际中的作用并不大。
+   * COUNT 限定返回的记录数。
+   * ASC: 查找结果根据距离从近到远排序。
+   * DESC: 查找结果根据从远到近排序
+ * `GEORADIUSBYMEMBER key member radius .. 同上`：根据储存在位置集合里面的某个地点获取指定范围内的地理位置集合。
+ * `GEOHASH key member [member ...]`：返回一个或多个位置对象的 geohash 值
+ 
+```shell script
+GEOADD Sicily 13.361389 38.115556 "Palermo" 15.087269 37.502669 "Catania" 
+GEODIST Sicily Palermo Catania # 默认 m
+GEORADIUS Sicily 15 37 100 km
+GEORADIUS Sicily 15 37 200 km
+
+``` 
+
 ### 参考
 
 [data-types-intro](https://redis.io/topics/data-types-intro)
+
+[菜鸟教程-Redis 数据类型](https://www.runoob.com/redis/redis-data-types.html)
