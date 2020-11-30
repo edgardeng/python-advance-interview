@@ -3,73 +3,73 @@
 ### 单列索引
 > 一个索引只包含单个列，一个表可以有多个单列索引，但这不是组合索引；
 
-* 创建索引 `CREATE INDEX index_name ON mytable(username(length));`
+* 创建索引 `CREATEINDEXindex_name ON mytable(username(length));`
 
-  如果是 CHAR，VARCHAR类型，length可以小于字段实际长度;
+ 如果是 CHAR，VARCHAR类型，length可以小于字段实际长度;
   如果是BLOB和TEXT类型，必须指定 length，下同。
 
-* 修改表结构 `ALTER mytable ADD INDEX [index_name] ON (username(length)) `
+* 修改表结构 `ALTERmytableADDINDEX[index_name] ON (username(length)) `
 
-* 创建表的时候直接指定 `CREATE TABLE mytable( ID INT NOT NULL, username VARCHAR(16) NOT NULL, INDEX [index_name] (username(length)) );`
+* 创建表的时候直接指定 `CREATE TABLE mytable( ID INT NOT NULL, usernameVARCHAR(16) NOT NULL, INDEX [index_name] (username(length)) );`
 
 * 删除索引的语法： `DROP INDEX [index_name] ON mytable; `
 
-* 创建唯一索引 `CREATE UNIQUE INDEX index_name ON mytable(username(length)) `
+* 创建唯一索引 `CREATEUNIQUEINDEX index_name ON mytable(username(length)) `
     > 索引列的值必须唯一，但允许有空值
                                                                           >
-* 修改表结构 `ALTER mytable ADD UNIQUE [index_name] ON (username(length))`
+* 修改表结构 `ALTERmytableADDUNIQUE[index_name] ON (username(length))`
 
-* 创建表的时候直接指定 `CREATE TABLE mytable( ID INT NOT NULL, username VARCHAR(16) NOT NULL, UNIQUE[index_name] (username(length)) );`
+* 创建表的时候直接指定 `CREATE TABLE mytable( ID INT NOT NULL, usernameVARCHAR(16) NOT NULL,UNIQUE[index_name] (username(length)) );`
 
 * 创建主键索引 `CREATE TABLE mytable( ID INT NOT NULL, username VARCHAR(16) NOT NULL, PRIMARY KEY(ID) );`
-  > 特殊的唯一索引，不允许有空值 当然也可以用 ALTER 命令。记住：一个表只能有一个主键。
+  > 特殊的唯一索引，不允许有空值 当然也可以用ALTER命令。记住：一个表只能有一个主键。
 
 
-  为了形象地对比单列索引和组合索引，为表添加多个字段：
+ 为了形象地对比单列索引和组合索引，为表添加多个字段：
 
-  CREATE TABLE mytable( ID INT NOT NULL, username VARCHAR(16) NOT NULL, city VARCHAR(50) NOT NULL, age INT NOT NULL );
+ CREATE TABLE mytable( ID INT NOT NULL, username VARCHAR(16) NOT NULL, city VARCHAR(50) NOT NULL, age INT NOT NULL );
 
-  为了进一步榨取MySQL的效率，就要考虑建立组合索引。就是将 name, city, age建到一个索引里：
+ 为了进一步榨取MySQL的效率，就要考虑建立组合索引。就是将 name, city, age建到一个索引里：
 
-  ALTER TABLE mytable ADD INDEX name_city_age (name(10),city,age);
+ ALTER TABLE mytableADDINDEX name_city_age (name(10),city,age);
 
-  建表时，usernname长度为 16，这里用 10。这是因为一般情况下名字的长度不会超过10，这样会加速索引查询速度，还会减少索引文件的大小，提高  INSERT的更新速度。
+ 建表时，usernname长度为 16，这里用 10。这是因为一般情况下名字的长度不会超过10，这样会加速索引查询速度，还会减少索引文件的大小，提高 INSERT的更新速度。
 
-  如果分别在 usernname，city，age上建立单列索引，让该表有3个单列索引，查询时和上述的组合索引效率也会大不一样，远远低于我们的组合索引。虽然此时有了三个索引，但MySQL只能用到其中的那个它认为似乎是最有效率的单列索引。
+ 如果分别在 usernname，city，age上建立单列索引，让该表有3个单列索引，查询时和上述的组合索引效率也会大不一样，远远低于我们的组合索引。虽然此时有了三个索引，但MySQL只能用到其中的那个它认为似乎是最有效率的单列索引。
 
-  建立这样的组合索引，其实是相当于分别建立了下面三组组合索引：
+ 建立这样的组合索引，其实是相当于分别建立了下面三组组合索引：
 
- 　　 usernname,city,age usernname,city usernname
+　　 usernname,city,age usernname,city usernname
 
-  为什么没有 city，age这样的组合索引呢?这是因为MySQL组合索引“最左前缀”的结果。简单的理解就是只从最左面的开始组合。并不是只要包含这三列的查询都会用到该组合索引，下面的几个SQL就会用到这个组合索引：
+ 为什么没有 city，age这样的组合索引呢?这是因为MySQL组合索引“最左前缀”的结果。简单的理解就是只从最左面的开始组合。并不是只要包含这三列的查询都会用到该组合索引，下面的几个SQL就会用到这个组合索引：
 
-  SELECT * FROM mytable WHREE username="admin" AND city="郑州" 　　SELECT * FROM mytable WHREE username="admin"
+SELECT* FROM mytable WHREE username="admin" AND city="郑州" 　　SELECT * FROM mytable WHREE username="admin"
 
-  而下面几个则不会用到：
+ 而下面几个则不会用到：
 
-  　　SELECT * FROM mytable WHREE age=20 AND city="郑州" 　　SELECT * FROM mytable WHREE city="郑州"
+ 　　SELECT * FROM mytable WHREE age=20 AND city="郑州" 　　SELECT * FROM mytable WHREE city="郑州"
 
-  (5)建立索引的时机
+(5)建立索引的时机
 
- 　　 到这里我们已经学会了建立索引，那么我们需要在什么情况下建立索引呢?
+　　 到这里我们已经学会了建立索引，那么我们需要在什么情况下建立索引呢?
 一般来说，在WHERE和JOIN中出现的列需要建立索引
 ，但也不完全如此，因为MySQL只对<，<=，=，>，>=，BETWEEN，IN，以及某些时候的LIKE才会使用索引
 。例如：
 
-  SELECT t.Name FROM mytable t LEFT JOIN mytable m ON t.Name=m.username WHERE m.age=20 AND m.city='郑州'
+ SELECT t.Name FROM mytable t LEFT JOIN mytable m ON t.Name=m.username WHERE m.age=20 AND m.city='郑州'
 
-  此时就需要对city和age建立索引，由于mytable表的 userame也出现在了JOIN子句中，也有对它建立索引的必要。
+ 此时就需要对city和age建立索引，由于mytable表的 userame也出现在了JOIN子句中，也有对它建立索引的必要。
 
-  刚才提到只有某些时候的LIKE才需建立索引。
+ 刚才提到只有某些时候的LIKE才需建立索引。
 因为在以通配符%和_开头作查询时，MySQL不会使用索引。例如下句会使用索引：
 
-  　　SELECT * FROM mytable WHERE username like'admin%'
+ 　　SELECT * FROM mytable WHERE username like'admin%'
 
-  而下句就不会使用：
+ 而下句就不会使用：
 
- 　　 SELECT * FROM mytable WHEREt Name like'%admin'
+　　 SELECT * FROM mytable WHEREt Name like'%admin'
 
-  因此，在使用LIKE时应注意以上的区别。
+ 因此，在使用LIKE时应注意以上的区别。
 
 #### 索引的不足之处
 
