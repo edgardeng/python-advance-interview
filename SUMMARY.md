@@ -1,16 +1,19 @@
 ## 目录
-* [Python基础](./01_basic_python/readme.md)
+* [1. Python基础](./01_basic_python/readme.md)
     * [基本语法](./01_basic_python/basic_syntax.md)
     * [数据类型与表量](./01_basic_python/data_type_variable.md)
     * [字符串和编码](./01_basic_python/string_code.md)
     * [集合类型](./01_basic_python/collection_type.md)
      
-* [函数](./02_function/readme.md)
+* [2. 函数](./02_function/readme.md)
     * [函数参数](./02_function/function_parameter.md)
+    * [作用域和闭包](./02_function/scope_block.md)
+* [3. 函数式编程](./03_functional_programming/readme.md)
+    * [高阶函数](./03_functional_programming/higher_order_function.md)
+    * [装饰器](./03_functional_programming/decorators.md)
     
-* [函数式编程](./03_functional_programming/readme.md)
-
-* [面向对象]()
+* [4. 面向对象](./04_object_oriented/readme.md)
+    * [](./)
 
 * [高级面向对象]()
 
