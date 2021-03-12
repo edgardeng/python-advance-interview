@@ -3,6 +3,9 @@
 
 [Github](https://github.com/edgardeng/python-advance-interview) | [Gitee](https://gitee.com/edgardeng/python-advance-interview)
 
+<!-- git remote add github https://github.com/edgardeng/python-advance-interview.git
+git push origin github --all -->
+
 ## 目录
 
 * Python基础
