@@ -21,13 +21,13 @@
 
 * [I/O编程]()
 
-* [Mysql数据库](./database/mysql/readme.md)  
+* [Mysql数据库](10_database/mysql/readme.md)  
 
-  * [Mysql索引原理](./database/mysql/mysql_index.md)  
+  * [Mysql索引原理](10_database/mysql/mysql_index.md)  
   
-  * [Mysql索引的使用](./database/mysql/use_mysql_index.md) 
+  * [Mysql索引的使用](10_database/mysql/use_mysql_index.md) 
   
-  * [Mysql事务](./database/mysql/mysql_transaction.md)  
+  * [Mysql事务](10_database/mysql/mysql_transaction.md)  
 
-* [Redis数据库](./database/redis/readme.md)  
+* [Redis数据库](10_database/redis/readme.md)  
 

@@ -199,6 +199,9 @@ CONFIG GET loglevel
 如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 redis 安装目录并启动服务即可。
 获取 redis 目录可以使用 CONFIG 命令，` CONFIG GET dir `
 
+### Redis 持久化
+
+
 ### Redis 安全
 1. `CONFIG get requirepass ` 查看是否设置了密码验证 
 2. `CONFIG set requirepass "123456" `  设置密码验证 
