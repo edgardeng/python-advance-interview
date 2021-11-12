@@ -28,7 +28,7 @@ def get_image(path_img):
 
 def handle_pixel():
     print('-' * 10, '2.3 图像像素获取和编辑')
-    img = cv2.imread('avatar.jpeg')
+    img = cv2.imread('../../../14_cv/avatar.jpeg')
     # 获取和设置
     pixel = img[100, 100]  # [57 63 68],获取(100,100)处的像素值
     img[100, 100] = [57, 63, 99]  # 设置像素值
@@ -52,7 +52,7 @@ def handle_pixel():
 
 
 def border():
-    img2 = cv2.imread('avatar.jpeg')
+    img2 = cv2.imread('../../../14_cv/avatar.jpeg')
     img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)  # matplotlib的图像为RGB格式
     constant = cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=[0, 255, 0])  # 绿色
     reflect = cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_REFLECT)
@@ -70,7 +70,7 @@ def border():
 def pixel_cal():
     # 2.5 像素算术运算
     import numpy as np
-    img1 = cv2.imread('avatar.jpeg', 0)
+    img1 = cv2.imread('../../../14_cv/avatar.jpeg', 0)
     roi_img = np.zeros(img1.shape[0:2], dtype=np.uint8)
     # print(img1.shape[0:2])
     roi_img[100:280, 400:550] = 255
@@ -81,14 +81,14 @@ def pixel_cal():
     cv2.imshow("img_add_mask", img_add_mask)
 
     img_2 = cv2.imread('scenery.jpeg')
-    img_1 = cv2.resize(cv2.imread('avatar.jpeg'), (img_2.shape[0], img_2.shape[1]))
+    img_1 = cv2.resize(cv2.imread('../../../14_cv/avatar.jpeg'), (img_2.shape[0], img_2.shape[1]))
     blend = cv2.addWeighted(img_1, 0.5, img_2, 0.9, 0)  # 两张图的大小和通道也应该相同
     cv2.imshow("blend", blend)
     cv2.waitKey(0)
 
 
 def pixel_bit_call():
-    img1 = cv2.resize(cv2.imread('avatar.jpeg'), (400, 400))
+    img1 = cv2.resize(cv2.imread('../../../14_cv/avatar.jpeg'), (400, 400))
     rows, cols = img1.shape[0:2]
     img2 = cv2.imread('scenery.jpeg')
     roi = img2[0:rows, 0:cols]
