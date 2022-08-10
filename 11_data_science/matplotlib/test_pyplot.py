@@ -112,9 +112,9 @@ def make_a_box():
 
 
 if __name__ == '__main__':
-  make_a_figure()
+  # make_a_figure()
   # makae_sub_figure()
-  # make_a_bar()
+  make_a_bar()
   # make_a_hist()
   # make_a_pie()
   # make_a_scatter()

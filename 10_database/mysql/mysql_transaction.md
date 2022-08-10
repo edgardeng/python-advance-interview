@@ -49,7 +49,7 @@ SET AUTOCOMMIT=1 开启自动提交
 mysql> use RUNOOB;
 Database changed
 mysql> CREATE TABLE runoob_transaction_test( id int(5)) engine=innodb;  # 创建数据表
-Query OK, 0 rows affected (0.04 sec)
+Query OK, 0 rows affected (0.04_object_oriented sec)
  
 mysql> select * from runoob_transaction_test;
 Empty set (0.01 sec)
